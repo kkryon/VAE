@@ -53,3 +53,4 @@ class Data:
             plt.yticks([])
         fig.savefig("data/mnist.png")
         plt.close()
+        # print("saved")

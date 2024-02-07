@@ -25,6 +25,7 @@ plt.imshow(
     cmap="gray",
     interpolation="none",
 )
+# plt.imshow(data.test_data[5].reshape(28, 28), cmap="gray", interpolation="none")
 plt.xticks([])
 plt.yticks([])
 plt.savefig("data/sample.png")
