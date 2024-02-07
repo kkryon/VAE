@@ -1,6 +1,9 @@
 import torchvision.datasets as datasets
 from torch.utils import data
 import torchvision.transforms as transforms
+import torch
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Data:
@@ -9,26 +12,30 @@ class Data:
         self.mnist_train = datasets.MNIST(
             "data",
             train=True,
-            download=False,
+            download=True,
             transform=transforms.Compose(
                 [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))],
             ),
         )
         self.mnist_test = datasets.MNIST(
             "data",
-            train=False,
+            train=True,
             download=False,
             transform=transforms.Compose(
                 [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))],
             ),
         )
 
-    def get_dataloaders(self, train_bs=512, test_bs=128):
+    def get_dataloaders(self, train_bs=30000, test_bs=1024):
         train_loader = data.DataLoader(
-            self.mnist_train, batch_size=train_bs, shuffle=True
+            self.mnist_train,
+            batch_size=train_bs,
+            shuffle=True,
         )
         test_loader = data.DataLoader(
-            self.mnist_test, batch_size=test_bs, shuffle=False
+            self.mnist_test,
+            batch_size=test_bs,
+            shuffle=False,
         )
         return train_loader, test_loader
 
