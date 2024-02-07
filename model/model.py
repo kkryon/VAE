@@ -1,4 +1,5 @@
 import torch
+import lightning as L
 import torch.nn as nn
 
 
@@ -42,12 +43,12 @@ class VAE_decoder(nn.Module):
         return x
 
 
-class VAE(nn.Module):
+class VAE(L.LightningModule):
     def __init__(self, hidden_dim=2):
         super().__init__()
         self.hidden_dim = hidden_dim
-        self.encode = VAE_encoder(input_dim=784)
-        self.decode = VAE_decoder(output_dim=784)
+        self.encode = VAE_encoder(input_dim=784, num_hidden=hidden_dim)
+        self.decode = VAE_decoder(output_dim=784, num_hidden=hidden_dim)
         self.mu = nn.Linear(self.hidden_dim, self.hidden_dim)
         self.log_var = nn.Linear(self.hidden_dim, self.hidden_dim)
 
@@ -56,7 +57,7 @@ class VAE(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
-    def forward(self, x):
+    def forward(self, x):  # pyright: ignore
         encoded = self.encode(x)
         mu = self.mu(encoded)
         log_var = self.log_var(encoded)
@@ -64,6 +65,17 @@ class VAE(nn.Module):
         decoded = self.decode(z)
         return encoded, decoded, mu, log_var
 
+    def training_step(self, batch, batch_idx):  # pyright: ignore
+        x, _ = batch
+        out = self.forward(x)
+        loss = nn.functional.mse_loss(out[1], torch.nn.Flatten()(x))
+        self.log("train_loss: ", loss)
+        return loss
+
     def sample(self, num_samples):
-        z = torch.randn(num_samples, 2)
+        z = torch.randn(num_samples, 2).to("cuda")
         return self.decode(z)
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        return optimizer

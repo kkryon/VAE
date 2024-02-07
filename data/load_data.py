@@ -26,16 +26,15 @@ class Data:
             ),
         )
 
-    def get_dataloaders(self, train_bs=30000, test_bs=1024):
+    def get_dataloaders(self, train_bs=1024, test_bs=1024):
         train_loader = data.DataLoader(
             self.mnist_train,
             batch_size=train_bs,
             shuffle=True,
+            num_workers=5,
         )
         test_loader = data.DataLoader(
-            self.mnist_test,
-            batch_size=test_bs,
-            shuffle=False,
+            self.mnist_test, batch_size=test_bs, shuffle=False, num_workers=5
         )
         return train_loader, test_loader
 
@@ -53,3 +52,4 @@ class Data:
             plt.xticks([])
             plt.yticks([])
         fig.savefig("data/mnist.png")
+        plt.close()
