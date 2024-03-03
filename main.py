@@ -10,11 +10,12 @@ data.show_images(train_loader)
 
 
 # trainer = L.Trainer(max_epochs=100)
-# trainer.fit(model=VAE(), train_dataloaders=train_loader)
+# trainer.fit(model=VAE(), train_dataloaders=krain_loader)
 
 model = VAE.load_from_checkpoint(
     "lightning_logs/version_4/checkpoints/epoch=99-step=5900.ckpt"
 )
+
 
 plt.imshow(
     model.forward(next(iter(test_loader))[0][5].to("cuda"))[1]
